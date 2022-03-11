@@ -1,5 +1,7 @@
 import gspread
 from google.oauth2.service_account import Credentials
+import datetime
+
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -44,9 +46,13 @@ def input_details():
         if validate_alpha_data(device_location):
             break
     
-    print('Return date: ')
-    return_date = input('(Please enter as dd/mm/yyyy)')
-    print(' \n')
+    while True:
+        print('Return date: ')
+        global return_date
+        return_date = input('(Please enter as DD-MM-YYYY)')
+        print(' \n')
+        if validate_date(return_date):
+            break
     
     print(f'NAME: {employee_name}')
     print(f'DEVICE NUMBER: {device_number}')
@@ -86,6 +92,21 @@ def validate_device_number(data, list):
     except ValueError as e:
         print(f'Invalid data: {e}')
         print(' \n')
+        return False
+    return True
+
+def validate_date(data):
+    """ 
+    Function that validates user input is valid
+    #format entry: dd/mm/yyyy
+    """   
+    date=data
+    format = "%d-%m-%Y"
+    try:
+        datetime.datetime.strptime(date, format)
+        print("This is the correct date string format.")
+    except ValueError:
+        print("This is the incorrect date string format. It should be DD-MM-YYYY")
         return False
     return True
 
