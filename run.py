@@ -1,6 +1,6 @@
 import gspread
 from google.oauth2.service_account import Credentials
-import datetime
+from datetime import datetime
 
 
 SCOPE = [
@@ -18,6 +18,7 @@ SHEET = GSPREAD_CLIENT.open('hybrid-laptops')
 #macpro = SHEET.worksheet('macpro')
 
 laptop_list='1 2 3 4 5'
+yes_no = ["Y", "N"]
 
 def input_details():
     """ 
@@ -51,15 +52,46 @@ def input_details():
     while True:
         print('Return date: ')
         global return_date
-        return_date = input('(Please enter as DD-MM-YYYY)')
+        my_string = str(input('Enter date: dd-mm-YYYY '))
+        global my_date
+        my_date = datetime.strptime(my_string, "%d-%m-%Y")  
         print(' \n')
-        if validate_date(return_date):
-            checkout_list.append(return_date)
+        global d
+        d = datetime.now()
+        global today_date
+        today_date = d.strftime("%d-%m-%Y")
+        print(my_date)
+        print(today_date)
+        print(d > my_date)
+        if validate_date(my_date, today_date):
+            checkout_list.append(my_date)
             break    
     print(f'NAME: {employee_name}')
     print(f'DEVICE NUMBER: {device_number}')
     print(f'LOCATION: {device_location}')
-    print(f'RETURN: {return_date}')
+    print(f'RETURN: {today_date}')
+
+def confirm_input():
+    """ 
+    Function to confirm user wants to submit data
+    """
+    print("Are the details displayed above correct?")
+    while True:
+        data_confirmation = input('Y or N?\n').upper()
+        if validate_key(data_confirmation, yes_no):
+            break
+
+def update_worksheet(data):
+    """
+    Update checkout worksheet, add new row with the list data provided
+    """
+    print("Updating ckeckout worksheet...\n")
+    macpro = SHEET.worksheet('macpro')
+    macpro.append_row(data)
+    print("Checkout worksheet updated successfully.\n")
+
+
+
 
 def validate_alpha_data(data):
     """
@@ -75,15 +107,6 @@ def validate_alpha_data(data):
         print(' \n')
         return False
     return True
-
-def update_worksheet(data):
-    """
-    Update checkout worksheet, add new row with the list data provided
-    """
-    print("Updating ckeckout worksheet...\n")
-    macpro = SHEET.worksheet('macpro')
-    macpro.append_row(data)
-    print("Checkout worksheet updated successfully.\n")
 
 
 def validate_device_number(data, list):
@@ -101,25 +124,21 @@ def validate_device_number(data, list):
         return False
     return True
 
-def validate_date(data):
+def validate_date(data, time):
     """ 
     Function that validates user input is valid
     #format entry: DD-MM-YYYY
-    """   
-    date = data
-    format = "%d-%m-%Y"
-
-    t = datetime.datetime.now()
-    time = t.strftime("%d-%m-%Y")
-
+    """
+    format ="%d-%m-%Y"
+    new_date = data.strftime("%d-%m-%Y")
     try:
-        if datetime.datetime.strptime(date, format) is False:
+        if datetime.strptime(new_date, format) is False:
             raise ValueError(
-                f"{date} is not in formar dd-mm-YYYY."
+                f"{data} is not in formar dd/mm/YYYY."
                 )
-        elif time > date:
+        elif d > my_date:
             raise ValueError(
-                f'Date entered is before today'
+                f'{data} is before today'
                 )
     except ValueError as e:
         print(f'Invalid data: {e}')
@@ -127,9 +146,29 @@ def validate_date(data):
         return False
     return True
 
+def validate_key(data, keys):
+    """
+    Function that validates data.
+    """
+    try:
+        if data not in keys:
+            raise ValueError(
+                f"Input--> {data}. Only {keys} are valid inputs."
+            )
+        elif (data.isalpha()) is False:
+            raise ValueError(
+                f'You entered {data} which is not an alphabetical string.'
+            )
+    except ValueError as e:
+        print(f"Invalid data: {e}")
+        return False
+    return True
+
+
+
 input_details()
 #update_worksheet(checkout_list)    
-
+confirm_input()
 
 
 
