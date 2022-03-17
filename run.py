@@ -14,8 +14,8 @@ SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('hybrid-laptops')
 
-#checkout = SHEET.worksheet('checkout')
-#macpro = SHEET.worksheet('macpro')
+checkout = SHEET.worksheet('checkout')
+macpro_1 = SHEET.worksheet('macpro1')
 
 laptop_list='1 2 3 4 5'
 yes_no = ["Y", "N"]
@@ -63,8 +63,8 @@ def input_details():
         print(my_date)
         print(today_date)
         print(d > my_date)
-        if validate_date(my_date, today_date):
-            checkout_list.append(my_date)
+        if validate_date(my_date, d, my_string):
+            checkout_list.append(my_string)
             break    
     print(f'NAME: {employee_name}')
     print(f'DEVICE NUMBER: {device_number}')
@@ -86,8 +86,8 @@ def update_worksheet(data):
     Update checkout worksheet, add new row with the list data provided
     """
     print("Updating ckeckout worksheet...\n")
-    macpro = SHEET.worksheet('macpro')
-    macpro.append_row(data)
+    macpro_1 = SHEET.worksheet('macpro1')
+    macpro_1.append_row(data)
     print("Checkout worksheet updated successfully.\n")
 
 
@@ -124,21 +124,20 @@ def validate_device_number(data, list):
         return False
     return True
 
-def validate_date(data, time):
+def validate_date(my_date, d, my_string):
     """ 
     Function that validates user input is valid
     #format entry: DD-MM-YYYY
     """
     format ="%d-%m-%Y"
-    new_date = data.strftime("%d-%m-%Y")
     try:
-        if datetime.strptime(new_date, format) is False:
+        if datetime.strptime(my_string, format) is False:
             raise ValueError(
-                f"{data} is not in formar dd/mm/YYYY."
+                f"{my_date} is not in format dd-mm-YYYY."
                 )
         elif d > my_date:
             raise ValueError(
-                f'{data} is before today'
+                f'{my_date} is before today'
                 )
     except ValueError as e:
         print(f'Invalid data: {e}')
@@ -167,10 +166,6 @@ def validate_key(data, keys):
 
 
 input_details()
-#update_worksheet(checkout_list)    
 confirm_input()
-
-
-
-
-    
+update_worksheet(checkout_list)    
+confirm_input()
