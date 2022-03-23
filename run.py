@@ -60,9 +60,13 @@ def input_details():
             d = datetime.now()
             global today_date
             today_date = d.strftime("%d-%m-%Y")
+            format = "%d-%m-%Y"
             if d < my_date:
                 break
             raise ValueError(f'{my_date} is before today')
+            if datetime.strptime(my_string, format):
+                break 
+            raise ValueError(f"{my_date} is not in format dd-mm-YYYY.")
         except ValueError as e:
             print(e)
         # print(my_date)
