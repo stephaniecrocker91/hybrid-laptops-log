@@ -50,22 +50,27 @@ def input_details():
             checkout_list.append(device_location)
             break
     while True:
-        print('Return date: ')
-        global return_date
-        my_string = str(input('Enter date: dd-mm-YYYY '))
-        global my_date
-        my_date = datetime.strptime(my_string, "%d-%m-%Y")  
-        print(' \n')
-        global d
-        d = datetime.now()
-        global today_date
-        today_date = d.strftime("%d-%m-%Y")
-        print(my_date)
-        print(today_date)
-        print(d > my_date)
-        if validate_date(my_date, d, my_string):
-            checkout_list.append(my_string)
-            break    
+        try:
+            print('Return date: ')
+            global my_string
+            my_string = str(input('Enter date: dd-mm-YYYY '))
+            global my_date
+            my_date = datetime.strptime(my_string, "%d-%m-%Y")
+            global d
+            d = datetime.now()
+            global today_date
+            today_date = d.strftime("%d-%m-%Y")
+            if d < my_date:
+                break
+            raise ValueError(f'{my_date} is before today')
+        except ValueError as e:
+            print(e)
+        # print(my_date)
+        # print(today_date)
+        # print(d > my_date)
+        # if validate_date(my_date, d, my_string):
+          #   checkout_list.append(my_string)
+            # break    
     print(f'NAME: {employee_name}')
     print(f'DEVICE NUMBER: {device_number}')
     print(f'LOCATION: {device_location}')
@@ -124,26 +129,8 @@ def validate_device_number(data, list):
         return False
     return True
 
-def validate_date(my_date, d, my_string):
-    """ 
-    Function that validates user input is valid
-    #format entry: DD-MM-YYYY
-    """
-    format ="%d-%m-%Y"
-    try:
-        if datetime.strptime(my_string, format) is False:
-            raise ValueError(
-                f"{my_date} is not in format dd-mm-YYYY."
-                )
-        elif d > my_date:
-            raise ValueError(
-                f'{my_date} is before today'
-                )
-    except ValueError as e:
-        print(f'Invalid data: {e}')
-        print(' \n')
-        return False
-    return True
+
+
 
 def validate_key(data, keys):
     """
